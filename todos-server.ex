@@ -4,7 +4,7 @@ defmodule TodosServer do
   # will have the interface functions
 
   def start do
-    ServerProcess.start()
+    ServerProcess.start(__MODULE__)
   end
 
   def init do
@@ -23,8 +23,24 @@ defmodule TodosServer do
     ServerProcess.cast(pid, {:remove_todo, id})
   end
 
-  def update_todo(pid, id, update_fn) do
-    ServerProcess.call(pid, {:update_todo, id, update_fn})
+  def update_todo(pid, id, updater_fn) do
+    ServerProcess.cast(pid, {:update_todo, id, updater_fn})
+  end
+
+  def handle_cast({:add_todo, todo}, todos) do
+    TodoList.add_todo(todos, todo)
+  end
+
+  def handle_cast({:update_todo, id, updater_fn}, todos) do
+    TodoList.update_todo(todos, id, updater_fn)
+  end
+
+  def handle_cast({:remove_todo, id}, todos) do
+    TodoList.delete_todo(todos, id)
+  end
+
+  def handle_call({:entries, date}, todos) do
+    {TodoList.entries(todos, date), todos}
   end
 end
 
@@ -34,16 +50,21 @@ defmodule ServerProcess do
   end
 
   def loop(callback_module, state) do
-    new_state =
-      receive do
-        message -> callback_module.handle_message(message)
-      end
+    receive do
+      {:call, message, caller} ->
+        {response, new_state} = callback_module.handle_call(message, state)
 
-    loop(callback_module, new_state)
+        send(caller, {:response, response})
+        loop(callback_module, new_state)
+
+      {:cast, message} ->
+        new_state = callback_module.handle_cast(message, state)
+        loop(callback_module, new_state)
+    end
   end
 
   def call(pid, message) do
-    send(pid, self(), message)
+    send(pid, {:call, message, self()})
 
     receive do
       {:response, message} -> message
@@ -53,7 +74,7 @@ defmodule ServerProcess do
   end
 
   def cast(pid, message) do
-    send(pid, message)
+    send(pid, {:cast, message})
   end
 end
 
