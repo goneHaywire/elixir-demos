@@ -6,18 +6,14 @@ seed = %{
 defmodule TodoList do
   defstruct next_id: 1, entries: %{}
 
-  def new() do
-    %TodoList{}
-  end
-
-  def import_task_list(list) do
-    Enum.reduce(list, TodoList.new(), &TodoList.add_todo(&2, &1))
+  def new(tasks \\ []) do
+    Enum.reduce(tasks, %TodoList{}, &add_todo(&2, &1))
   end
 
   def entries(todo_list, date) do
     todo_list.entries
     |> Map.values()
-    |> Enum.filter(fn entry -> entry.date == date end)
+    |> Enum.filter(&(&1.date == date))
   end
 
   def add_todo(todo_list, entry) do
