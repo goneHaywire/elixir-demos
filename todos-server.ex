@@ -50,17 +50,18 @@ defmodule ServerProcess do
   end
 
   def loop(callback_module, state) do
-    receive do
+    new_state = receive do
       {:call, message, caller} ->
         {response, new_state} = callback_module.handle_call(message, state)
 
         send(caller, {:response, response})
-        loop(callback_module, new_state)
+        new_state
 
       {:cast, message} ->
-        new_state = callback_module.handle_cast(message, state)
-        loop(callback_module, new_state)
+        callback_module.handle_cast(message, state)
     end
+
+    loop(callback_module, new_state)
   end
 
   def call(pid, message) do
@@ -81,18 +82,14 @@ end
 defmodule TodoList do
   defstruct next_id: 1, entries: %{}
 
-  def new() do
-    %TodoList{}
-  end
-
-  def import_task_list(list) do
-    Enum.reduce(list, TodoList.new(), &TodoList.add_todo(&2, &1))
+  def new(tasks \\ []) do
+    Enum.reduce(tasks, %TodoList{}, &add_todo(&2, &1))
   end
 
   def entries(todo_list, date) do
     todo_list.entries
     |> Map.values()
-    |> Enum.filter(fn entry -> entry.date == date end)
+    |> Enum.filter(&(&1.date == date))
   end
 
   def add_todo(todo_list, entry) do
