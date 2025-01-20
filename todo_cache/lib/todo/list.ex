@@ -2,7 +2,7 @@ defmodule Todo.List do
   defstruct next_id: 1, entries: %{}
 
   def new(tasks \\ []) do
-    Enum.reduce(tasks, %TodoList{}, &add_todo(&2, &1))
+    Enum.reduce(tasks, %Todo.List{}, &add_todo(&2, &1))
   end
 
   def entries(todo_list, date) do
