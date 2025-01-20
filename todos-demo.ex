@@ -57,6 +57,6 @@ defmodule TodoList.CsvReader do
     |> Stream.map(&String.split(&1, ","))
     |> Stream.map(fn [date, title] -> %{date: Date.from_iso8601!(date), title: title} end)
     |> Enum.to_list()
-    |> TodoList.import_task_list()
+    |> TodoList.new()
   end
 end
