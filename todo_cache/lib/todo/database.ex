@@ -24,7 +24,7 @@ defmodule Todo.Database do
   def handle_cast({:store, key, val}, state) do
     key 
       |> file_name()
-      |> File.write!(:erlang.term_to_binary(data))
+      |> File.write!(:erlang.term_to_binary(val))
     
     {:noreply, state}
   end
