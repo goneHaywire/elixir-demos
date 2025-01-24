@@ -41,8 +41,8 @@ defmodule Todo.Server do
   end
 
   # interface functions
-  def start(list_name) do
-    GenServer.start(__MODULE__, list_name)
+  def start_link(list_name) do
+    GenServer.start_link(__MODULE__, list_name)
   end
 
   def entries(pid, date) do
