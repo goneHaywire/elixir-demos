@@ -1,5 +1,30 @@
 defmodule Todo.Server do
-  use GenServer
+  use GenServer, restart: :temporary
+
+  # interface functions
+  def start_link(list_name) do
+    GenServer.start_link(__MODULE__, list_name, name: via_tuple(list_name))
+  end
+
+  def entries(pid, date) do
+    GenServer.call(pid, {:entries, date})
+  end
+
+  def add_todo(pid, entry) do
+    GenServer.cast(pid, {:add_todo, entry})
+  end
+
+  def update_todo(pid, id, updater_fn) do
+    GenServer.cast(pid, {:update_todo, id, updater_fn})
+  end
+
+  def remove_todo(pid, id) do
+    GenServer.cast(pid, {:remove_todo, id})
+  end
+
+  defp via_tuple(list_name) do
+    Todo.ProcessRegistry.via_tuple({__MODULE__, list_name})
+  end
   
   @impl GenServer
   def init(list_name) do
@@ -38,26 +63,5 @@ defmodule Todo.Server do
     new_todos = Todo.List.delete_todo(todos, id)
     Todo.Database.store(list_name, new_todos)
     {:noreply, {list_name, new_todos}}
-  end
-
-  # interface functions
-  def start_link(list_name) do
-    GenServer.start_link(__MODULE__, list_name)
-  end
-
-  def entries(pid, date) do
-    GenServer.call(pid, {:entries, date})
-  end
-
-  def add_todo(pid, entry) do
-    GenServer.cast(pid, {:add_todo, entry})
-  end
-
-  def update_todo(pid, id, updater_fn) do
-    GenServer.cast(pid, {:update_todo, id, updater_fn})
-  end
-
-  def remove_todo(pid, id) do
-    GenServer.cast(pid, {:remove_todo, id})
   end
 end
