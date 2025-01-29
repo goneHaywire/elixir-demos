@@ -1,17 +1,17 @@
 defmodule Todo.Cache do
-  def start_link(_) do
+  def start_link() do
     IO.puts("Cache Server Starting")
 
     DynamicSupervisor.start_link(
       name: __MODULE__,
-      strategy: :one_for_one,
+      strategy: :one_for_one
     )
   end
 
   defp start_child(todo_list_name) do
     DynamicSupervisor.start_child(
       __MODULE__,
-      {Todo.Server, todo_list_name},
+      {Todo.Server, todo_list_name}
     )
   end
 
