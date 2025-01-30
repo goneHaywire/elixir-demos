@@ -1,23 +1,24 @@
 defmodule Todo.DatabaseWorker do
   use GenServer 
 
-  def start_link({db_folder, id}) do
-    GenServer.start_link(__MODULE__, db_folder, name: via_tuple(id))
+  def start_link(db_folder) do
+    GenServer.start_link(__MODULE__, db_folder)
   end
 
   def store(worker_id, key, data) do
-    IO.inspect("Get Key: #{key} from worker_id: #{worker_id}")
-    GenServer.cast(via_tuple(worker_id), {:store, key, data})
+    IO.inspect("Get Key: #{key} from worker_id: #{inspect(worker_id)}")
+    GenServer.cast(worker_id, {:store, key, data})
   end
 
   def get(worker_id, key) do
-    IO.inspect("Get Key: #{key} from worker_id: #{worker_id}")
-    GenServer.call(via_tuple(worker_id), {:get, key})
+    IO.inspect("Get Key: #{key} from worker_id: #{inspect(worker_id)}")
+    GenServer.call(worker_id, {:get, key})
   end
 
-  defp via_tuple(id) do
-    Todo.ProcessRegistry.via_tuple({__MODULE__, id})
-  end
+  # irrelevant if using poolboy to manage workers
+  # defp via_tuple(id) do
+  #   Todo.ProcessRegistry.via_tuple({__MODULE__, id})
+  # end
 
   @impl GenServer
   def init(db_folder) do
