@@ -32,5 +32,4 @@ defmodule Todo.Database do
       end
     )
   end
-
 end

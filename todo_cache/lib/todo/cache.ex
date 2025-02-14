@@ -19,7 +19,7 @@ defmodule Todo.Cache do
     %{
       id: __MODULE__,
       start: {__MODULE__, :start_link, []},
-      type: :supervisor,
+      type: :supervisor
     }
   end
 

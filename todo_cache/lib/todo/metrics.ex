@@ -6,6 +6,7 @@ defmodule Todo.Metrics do
   def start_link(_) do
     IO.puts("Starting Metrics Task (#{@metrics_interval_seconds}s)")
     Task.Supervisor.start_link(name: MyTaskSupervisor)
+
     Task.Supervisor.start_child(
       MyTaskSupervisor,
       &loop/0
@@ -21,8 +22,7 @@ defmodule Todo.Metrics do
   defp collect_metrics() do
     [
       memory_usage: :erlang.memory(:total),
-      process_count: :erlang.system_info(:process_count),
+      process_count: :erlang.system_info(:process_count)
     ]
   end
-
 end

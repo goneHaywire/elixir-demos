@@ -1,8 +1,8 @@
 defmodule Todo.Web do
   use Plug.Router
 
-  plug :match
-  plug :dispatch
+  plug(:match)
+  plug(:dispatch)
 
   post "/add_entry" do
     conn = Plug.Conn.fetch_query_params(conn)
@@ -11,12 +11,12 @@ defmodule Todo.Web do
     date = Map.fetch!(conn.params, "date") |> Date.from_iso8601!()
 
     list_name
-      |> Todo.Cache.server_process()
-      |> Todo.Server.add_todo(%{title: title, date: date})
+    |> Todo.Cache.server_process()
+    |> Todo.Server.add_todo(%{title: title, date: date})
 
     conn
-      |> Plug.Conn.put_resp_content_type("text/plain")
-      |> Plug.Conn.send_resp(200, "OK")
+    |> Plug.Conn.put_resp_content_type("text/plain")
+    |> Plug.Conn.send_resp(200, "OK")
   end
 
   get "/entries" do
@@ -24,7 +24,7 @@ defmodule Todo.Web do
     list_name = Map.fetch!(conn.params, "list")
     date = Map.fetch!(conn.params, "date") |> Date.from_iso8601!()
 
-    entries = 
+    entries =
       list_name
       |> Todo.Cache.server_process()
       |> Todo.Server.entries(date)
@@ -32,10 +32,10 @@ defmodule Todo.Web do
       |> Enum.join("\n")
 
     conn
-      |> Plug.Conn.put_resp_content_type("text/plain")
-      |> Plug.Conn.send_resp(200, entries)
+    |> Plug.Conn.put_resp_content_type("text/plain")
+    |> Plug.Conn.send_resp(200, entries)
   end
-  
+
   def child_spec(_arg) do
     Plug.Cowboy.child_spec(
       scheme: :http,

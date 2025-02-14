@@ -10,8 +10,8 @@ defmodule Todo.ProcessRegistry do
   def child_spec(_) do
     Supervisor.child_spec(
       Registry,
-      id: __MODULE__, start: {__MODULE__, :start_link, []}
+      id: __MODULE__,
+      start: {__MODULE__, :start_link, []}
     )
   end
-  
 end

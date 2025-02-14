@@ -3,7 +3,7 @@ defmodule Todo.Server do
 
   def start_link(list_name) do
     Agent.start_link(
-      fn -> 
+      fn ->
         IO.puts("Starting to-do server for #{list_name}")
         {list_name, Todo.Database.get(list_name) || Todo.List.new()}
       end,

@@ -1,6 +1,6 @@
 import Config
 
-http_port = 
+http_port =
   if config_env() != :test,
     do: System.get_env("TODO_HTTP_PORT", "5454"),
     else: System.get_env("TODO_HTTP_PORT", "5455")
